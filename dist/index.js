@@ -68,16 +68,16 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         yield octokit.issues.addAssignees(Object.assign(Object.assign({}, context.repo), { issue_number: context.issue.number, assignees: [context.actor] }));
         core.info(`Auto assign pull request to ${context.actor} successfully ! `);
     });
-    const addReviewers = (reviewers, numberReviewers, isRandomReview) => __awaiter(void 0, void 0, void 0, function* () {
+    const addReviewers = (reviewers, numberReviewers) => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
-        yield octokit.pulls.requestReviewers(Object.assign(Object.assign({}, context.repo), { reviewers: isRandomReview
+        yield octokit.pulls.requestReviewers(Object.assign(Object.assign({}, context.repo), { reviewers: isRandomReview === "true"
                 ? randomReviewers(reviewers, numberReviewers)
                 : removeAuthor(reviewers), pull_number: (_a = context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number }));
         core.info(`Auto assign pull request to reviewers successfully ! `);
         core.info("This PR is randomly assigned: " + isRandomReview);
     });
     yield addAuthor();
-    yield addReviewers(reviewers, numberReviewers, isRandomReview);
+    yield addReviewers(reviewers, numberReviewers);
 });
 main().catch((err) => core.setFailed(err));
 

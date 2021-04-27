@@ -47,12 +47,13 @@ const main = async () => {
     core.info(`Auto assign pull request to ${context.actor} successfully ! `);
   };
 
-  const addReviewers = async (reviewers, numberReviewers, isRandomReview) => {
+  const addReviewers = async (reviewers, numberReviewers) => {
     await octokit.pulls.requestReviewers({
       ...context.repo,
-      reviewers: isRandomReview
-        ? randomReviewers(reviewers, numberReviewers)
-        : removeAuthor(reviewers),
+      reviewers:
+        isRandomReview === "true"
+          ? randomReviewers(reviewers, numberReviewers)
+          : removeAuthor(reviewers),
       pull_number: context.payload.pull_request?.number,
     });
     core.info(`Auto assign pull request to reviewers successfully ! `);
@@ -60,7 +61,7 @@ const main = async () => {
   };
 
   await addAuthor();
-  await addReviewers(reviewers, numberReviewers, isRandomReview);
+  await addReviewers(reviewers, numberReviewers);
 };
 
 main().catch((err) => core.setFailed(err));
