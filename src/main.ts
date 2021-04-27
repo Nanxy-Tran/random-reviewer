@@ -1,5 +1,5 @@
-const core = require("@actions/core");
-const github = require("@actions/github");
+import * as core from "@actions/core";
+import * as github from "@actions/github";
 
 const main = async () => {
   const context = github.context;
@@ -18,7 +18,7 @@ const main = async () => {
 
   const addAuthor = async () => {
     core.info(context.actor);
-    await octokit.pulls.addAssignees({
+    await octokit.issues.addAssignees({
       ...context.repo,
       issue_number: context.issue.number,
       assignees: [context.actor],
