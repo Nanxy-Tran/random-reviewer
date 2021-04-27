@@ -18,12 +18,7 @@ inputs:
     description: "Random pick reviewers"
     default: "false"
     required: false
-  org:
-    description: "Organization for workflow"
-    required: true
-  team:
-    description: "Team for team review"
-    required: false
+
 runs:
   using: "node12"
   main: "dist/index.js"

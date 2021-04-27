@@ -44,43 +44,39 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         return;
     }
     const githubToken = core.getInput("token");
-    const org = core.getInput("org");
-    const team = core.getInput("team");
     const numberReviewers = core.getInput("numberReviewers");
     const isRandomReview = core.getInput("randomReview");
     const reviewers = core.getInput("reviewers").split(".");
     const octokit = github.getOctokit(githubToken);
-    const addAuthor = () => __awaiter(void 0, void 0, void 0, function* () {
-        core.info(context.actor);
-        yield octokit.issues.addAssignees(Object.assign(Object.assign({}, context.repo), { issue_number: context.issue.number, assignees: [context.actor] }));
-    });
     if (!reviewers || reviewers.length < 1)
         throw new Error("List of reviewers is not provided !");
-    const getTeamMembers = () => __awaiter(void 0, void 0, void 0, function* () {
-        return yield octokit.teams.listMembersInOrg({
-            org,
-            team_slug: team,
-        });
+    const removeAuthor = (reviewers) => reviewers.filter((reviewer) => reviewer !== context.actor);
+    const getUnique = (array) => [...new Set([...array])];
+    const randomReviewers = (reviewers, numberReviewers) => {
+        reviewers = removeAuthor(reviewers);
+        let result = [];
+        if (reviewers.length < numberReviewers)
+            return reviewers;
+        while (getUnique(result).length < numberReviewers) {
+            let randomReviewer = reviewers[Math.floor(Math.random() * reviewers.length)];
+            result.push(randomReviewer);
+            core.info("Picked reviewer: " + randomReviewer);
+        }
+        return result;
+    };
+    const addAuthor = () => __awaiter(void 0, void 0, void 0, function* () {
+        yield octokit.issues.addAssignees(Object.assign(Object.assign({}, context.repo), { issue_number: context.issue.number, assignees: [context.actor] }));
+        core.info(`Auto assign pull request to ${context.actor} successfully ! `);
     });
     const addReviewers = (reviewers, numberReviewers, isRandomReview) => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
         yield octokit.pulls.requestReviewers(Object.assign(Object.assign({}, context.repo), { reviewers: isRandomReview
                 ? randomReviewers(reviewers, numberReviewers)
                 : removeAuthor(reviewers), pull_number: (_a = context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number }));
+        core.info(`Auto assign pull request to reviewers successfully ! `);
+        core.info("This PR is randomly assigned: " + isRandomReview);
     });
-    const removeAuthor = (reviewers) => reviewers.filter((reviewer) => reviewer !== context.actor);
-    const randomReviewers = (reviewers, numberReviewers) => {
-        reviewers = removeAuthor(reviewers);
-        let result = [];
-        while (result.length < numberReviewers)
-            result.push(reviewers[Math.floor(Math.random() * reviewers.length)]);
-        return result;
-    };
     yield addAuthor();
-    if (team && org) {
-        let members = yield getTeamMembers();
-        core.info(JSON.stringify(members.data));
-    }
     yield addReviewers(reviewers, numberReviewers, isRandomReview);
 });
 main().catch((err) => core.setFailed(err));
