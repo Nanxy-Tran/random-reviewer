@@ -9,6 +9,9 @@ const main = async () => {
   }
 
   const githubToken = core.getInput("token");
+  const org = core.getInput("org");
+  const team = core.getInput("team");
+
   const numberReviewers = core.getInput("numberReviewers");
   const isRandomReview = core.getInput("randomReview");
   const reviewers = core.getInput("reviewers").split(".");
@@ -25,6 +28,13 @@ const main = async () => {
 
   if (!reviewers || reviewers.length < 1)
     throw new Error("List of reviewers is not provided !");
+
+  const getTeamMembers = async () => {
+    return await octokit.teams.listMembersInOrg({
+      org,
+      team_slug: team,
+    });
+  };
 
   const addReviewers = async (reviewers, numberReviewers, isRandomReview) => {
     await octokit.pulls.requestReviewers({
@@ -48,6 +58,11 @@ const main = async () => {
   };
 
   await addAuthor();
+  if (team && org) {
+    let members = await getTeamMembers();
+    core.info(JSON.stringify(members.data));
+  }
+
   await addReviewers(reviewers, numberReviewers, isRandomReview);
 };
 
