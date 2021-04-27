@@ -74,7 +74,10 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
                 ? randomReviewers(reviewers, numberReviewers)
                 : removeAuthor(reviewers), pull_number: (_a = context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number }));
         core.info(`Auto assign pull request to reviewers successfully ! `);
-        core.info("This PR is randomly assigned: " + isRandomReview);
+        core.info("This PR is randomly assigned: " +
+            isRandomReview +
+            "type of isRandom" +
+            typeof isRandomReview);
     });
     yield addAuthor();
     yield addReviewers(reviewers, numberReviewers);
