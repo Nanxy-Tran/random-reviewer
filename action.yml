@@ -13,10 +13,16 @@ inputs:
   numberReviewers:
     required: false
     description: "Number of developers needed for reviewing PR"
-    default: 1
-  randonReview:
+    default: "1"
+  randomReview:
     description: "Random pick reviewers"
-    default: false
+    default: "false"
+    required: false
+  org:
+    description: "Organization for workflow"
+    required: true
+  team:
+    description: "Team for team review"
     required: false
 runs:
   using: "node12"
