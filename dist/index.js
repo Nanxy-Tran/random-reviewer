@@ -48,24 +48,24 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const isRandomReview = core.getInput("randomReview");
     const reviewers = core.getInput("reviewers").split(".");
     const octokit = github.getOctokit(githubToken);
-    if (!reviewers || reviewers.length < 1)
-        throw new Error("List of reviewers is not provided !");
     const addAuthor = () => __awaiter(void 0, void 0, void 0, function* () {
         core.info(context.actor);
         yield octokit.issues.addAssignees(Object.assign(Object.assign({}, context.repo), { issue_number: context.issue.number, assignees: [context.actor] }));
     });
+    if (!reviewers || reviewers.length < 1)
+        throw new Error("List of reviewers is not provided !");
     const addReviewers = (reviewers, numberReviewers, isRandomReview) => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
         yield octokit.pulls.requestReviewers(Object.assign(Object.assign({}, context.repo), { reviewers: isRandomReview
                 ? randomReviewers(reviewers, numberReviewers)
-                : reviewers, pull_number: (_a = context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number }));
+                : removeAuthor(reviewers), pull_number: (_a = context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number }));
     });
+    const removeAuthor = (reviewers) => reviewers.filter((reviewer) => reviewer !== context.actor);
     const randomReviewers = (reviewers, numberReviewers) => {
-        const author = context.actor;
-        const availableReviewers = reviewers.filter((reviewer) => reviewer !== author);
+        reviewers = removeAuthor(reviewers);
         let result = [];
         while (result.length < numberReviewers)
-            result.push(availableReviewers[Math.floor(Math.random() * availableReviewers.length)]);
+            result.push(reviewers[Math.floor(Math.random() * reviewers.length)]);
         return result;
     };
     yield addAuthor();

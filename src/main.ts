@@ -13,8 +13,6 @@ const main = async () => {
   const isRandomReview = core.getInput("randomReview");
   const reviewers = core.getInput("reviewers").split(".");
   const octokit = github.getOctokit(githubToken);
-  if (!reviewers || reviewers.length < 1)
-    throw new Error("List of reviewers is not provided !");
 
   const addAuthor = async () => {
     core.info(context.actor);
@@ -25,28 +23,27 @@ const main = async () => {
     });
   };
 
+  if (!reviewers || reviewers.length < 1)
+    throw new Error("List of reviewers is not provided !");
+
   const addReviewers = async (reviewers, numberReviewers, isRandomReview) => {
     await octokit.pulls.requestReviewers({
       ...context.repo,
       reviewers: isRandomReview
         ? randomReviewers(reviewers, numberReviewers)
-        : reviewers,
+        : removeAuthor(reviewers),
       pull_number: context.payload.pull_request?.number,
     });
   };
 
+  const removeAuthor = (reviewers) =>
+    reviewers.filter((reviewer) => reviewer !== context.actor);
+
   const randomReviewers = (reviewers, numberReviewers) => {
-    const author = context.actor;
-    const availableReviewers = reviewers.filter(
-      (reviewer) => reviewer !== author
-    );
+    reviewers = removeAuthor(reviewers);
     let result: any = [];
     while (result.length < numberReviewers)
-      result.push(
-        availableReviewers[
-          Math.floor(Math.random() * availableReviewers.length)
-        ]
-      );
+      result.push(reviewers[Math.floor(Math.random() * reviewers.length)]);
     return result;
   };
 
