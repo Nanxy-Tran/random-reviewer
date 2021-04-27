@@ -11,7 +11,7 @@ const main = async () => {
   const githubToken = core.getInput("token");
   const numberReviewers = core.getInput("numberReviewers");
   const isRandomReview = core.getInput("randomReview");
-  const reviewers = core.getInput("reviewers");
+  const reviewers = core.getInput("reviewers").split(".");
   const octokit = github.getOctokit(githubToken);
   if (!reviewers || reviewers.length < 1)
     throw new Error("List of reviewers is not provided !");
