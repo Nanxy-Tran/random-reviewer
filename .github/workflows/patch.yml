@@ -21,13 +21,10 @@ jobs:
              https://api.github.com/repos/Nanxy-Tran/random-reviewer/releases/latest
           )
 
-          echo "::set-output name=latest_release::${{ toJson(latest_release) }}"
+          echo "::set-output name=latest_release::${latest_release}"
 
       - name: Patch hotfix to production 🔥
-        env:
-          LATEST_VERSION: ${{ fromJson(steps.fetch_latest_release.outputs.latest_release).tag_name }}
         run: |
-          echo $LATEST_VERSION
-          echo ${LATEST_VERSION:1}
+          echo "${{ fromJson(steps.fetch_latest_release.outputs.latest_release).tag_name }}"
 
 
