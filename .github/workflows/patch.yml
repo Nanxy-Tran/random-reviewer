@@ -25,7 +25,7 @@ jobs:
 
       - name: Patch hotfix to production 🔥
         env:
-          LATEST_VERSION: ${{ toJson(steps.fetch_latest_release.outputs.latest_release).tag_name }}
+          LATEST_VERSION: ${{ fromJson(steps.fetch_latest_release.outputs.latest_release).tag_name }}
         run: |
           echo $LATEST_VERSION
           echo ${LATEST_VERSION:1}
