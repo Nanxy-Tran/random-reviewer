@@ -18,7 +18,7 @@ jobs:
         run: |
           latest_release=$(curl \
             -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/Nanxy-Tran/random_reviewer/releases/latest
+             https://api.github.com/repos/Nanxy-Tran/random-reviewer/releases/latest
           )
 
           echo "::set-output name=latest_release::${latest_release}"
