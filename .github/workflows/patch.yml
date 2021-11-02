@@ -20,11 +20,11 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
              https://api.github.com/repos/Nanxy-Tran/random-reviewer/releases/latest
           )
-
+          echo $latest_release | jq '.tag_name'
           echo "::set-output name=latest_release::${latest_release}"
 
       - name: Patch hotfix to production 🔥
         run: |
-          echo "${{ fromJson(steps.fetch_latest_release.outputs.latest_release).tag_name }}"
+          echo $latest_release | jq '.tag_name'
 
 
