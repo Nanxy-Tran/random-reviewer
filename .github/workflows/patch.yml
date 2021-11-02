@@ -22,7 +22,7 @@ jobs:
              jq '.tag_name' | cut -d'"' -f 2
           )
           echo $latest_release
-          echo "::set-output name=latest_release::${latest_release:2:1}"
+          echo "::set-output name=latest_release::${latest_release:1}"
 
       - name: Patch hotfix to production 🔥
         env:
