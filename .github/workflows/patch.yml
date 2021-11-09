@@ -79,7 +79,7 @@ jobs:
               console.log(nextMilestone)
 
               webhook.send({
-                text: `Thank everyone for your contribution to our latest release 🎉🎉🎉 \n The next release <${nextMilestone.url}| *is* ${nextMilestone.title}> \n Remember to link your PRs to this milestone so you won’t miss the release :wink:`
+                text: `Thank everyone for your contribution to our latest release 🎉🎉🎉 \n The next release <${nextMilestone.data.url}| *is* ${nextMilestone.data.title}> \n Remember to link your PRs to this milestone so you won’t miss the release :wink:`
               })      
             }
 
