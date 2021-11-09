@@ -1,33 +1,150 @@
-name: Patch hotfix to production
+name: Release PR
 on:
   pull_request:
     types:
       - opened
-      - synchronize
+      - closed
+    branches:
+      - v1
 
 jobs:
-  patch-hotfix:
+  update-release-content:
+    if: ${{ contains(github.head_ref, 'release/v') && github.event.action == 'opened' }}
+    runs-on: ubuntu-latest
+    outputs:
+      releaseContent: ${{ steps.updateRelease.outputs.releaseList }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - run: npm install lodash.groupby
+      - id: updateRelease
+        uses: actions/github-script@v5
+        env:
+          BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+        with:
+          result-encoding: string
+          script: |
+            const groupBy = require('lodash.groupby');
+            const { BRANCH_NAME } = process.env;
+            const version = BRANCH_NAME.replace('release/', '');
+            const params = [
+              'repo:' + context.repo.owner + '/' + context.repo.repo,
+              'type:pr',
+              'milestone:' + version,
+              'state:closed'
+            ]
+            const issue = await github.request('GET /search/issues', {
+              q: params.join('+')
+            });
+
+            const milestone = groupBy(issue.data.items, pr => pr.assignee.login);
+
+            const newLine = `
+
+            @`;
+
+            const header = `## Type
+            **RELEASE**
+
+            ## Description`;
+
+            const body = Object.keys(milestone).reduce((description, assignee) => {
+              description = description + newLine + assignee
+              const listPR = milestone[assignee]
+              const prContent = listPR.map(pr => '\n- ' + pr.pull_request.html_url)
+              return description + prContent
+            }, header);
+
+            const releaseList = Object.keys(milestone).reduce((description, assignee) => {
+              const listPR = milestone[assignee]
+              const prContent = listPR.map(pr => '\n- ' + pr.pull_request.html_url)
+              return description + prContent
+            }, '')
+
+            github.rest.pulls.update({
+              body,
+              pull_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            return releaseList
+
+  create-release:
+    if: ${{ contains(github.head_ref, 'release/v') && github.event.action == 'closed' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: '14'
-
-      - id: fetch_latest_release
-        run: |
-          latest_release=$(curl \
-            -H "Accept: application/vnd.github.v3+json" \
-             https://api.github.com/repos/Nanxy-Tran/random-reviewer/releases/latest |
-             jq '.tag_name' | cut -d'"' -f 2
-          )
-          echo $latest_release
-          echo "::set-output name=latest_release::${latest_release:1}"
-
-      - name: Patch hotfix to production 🔥
+          node-version: 14
+      - name: Create release
+      - uses: actions/github-script@v5
         env:
-          LATEST_VERSION: ${{steps.fetch_latest_release.outputs.latest_release}}
-        run: |
-          echo $LATEST_VERSION
+          BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+          REALEASE_CONTENT: ${{ needs.update-release-content.outputs.releaseContent }}
+        with:
+          script: |
+            const { BRANCH_NAME, REALEASE_CONTENT } = process.env;
+            const { owner, repo } = context.repo;
+            const tag_name = BRANCH_NAME.replace('release/', '')
+            const { milestone } = context.payload.pull_request;
 
+            if (!milestone) return;
+            const release_due_on = milestone.due_on;
 
+            const releaseDate = new Date(release_due_on);
+            const tag_time = `${releaseDate.getFullYear()}-${releaseDate.getMonth()}-${releaseDate.getDate()}`;
+
+            const release = await github.rest.repos.createRelease({
+              owner,
+              repo,
+              tag_name,
+              name: `[${tag_name}] ${tag_time}`,
+              draft: true,
+              body: REALEASE_CONTENT,
+              generate_release_notes: true
+            });
+
+  create-milestone:
+    if: ${{ contains(github.head_ref, 'release/v') && github.event.action == 'closed' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - run: npm install @slack/webhook
+      - name: Create next milestone
+      - uses: actions/github-script@v5
+        env:
+          SLACK_URL: ${{ secrets.SLACK_HOOK_RELEASE }}
+        with:
+          script: |
+            const { IncomingWebhook } = require('@slack/webhook');
+            const date = new Date();
+            const { milestone } = context.payload.pull_request;
+            date.setDate(date.getDate() + (8 - date.getDay()));
+
+            const versions = milestone.title.split('.');
+            versions[2] = Number(versions[2]) + 1;
+            const nextVersion =  versions.join('.')
+
+            const nextMilestone = await github.rest.issues.createMilestone({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: nextVersion,
+              due_on: date.toISOString()
+            })
+
+            if (nextMilestone) {
+              const web_hook_url = process.env.SLACK_URL;
+              const webhook = new IncomingWebhook(web_hook_url);
+              const { url_html, title } = nextMilestone.data;
+
+              webhook.send({
+                text: `Thank everyone for your contribution to our latest release 🎉🎉🎉 \n The next release is <${url_html}|${title}> \n Remember to link your PRs to this milestone so you won’t miss the release :wink:`
+              })
+            }
