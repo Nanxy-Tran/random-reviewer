@@ -84,7 +84,4 @@ jobs:
               const webhook = new IncomingWebhook(web_hook_url);
               const { url_html, title } = nextMilestone.data;
               console.log(nextMilestone.data);
-#              webhook.send({
-#                text: `Thank everyone for your contribution to our latest release 🎉🎉🎉 \n The next release is <${url_html}|${title}> \n Remember to link your PRs to this milestone so you won’t miss the release :wink:`
-#              })
             }
