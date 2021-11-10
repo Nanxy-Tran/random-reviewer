@@ -32,7 +32,9 @@ jobs:
               repo
             })
 
-            const currentMilestone = allMilestone.data.find(milestone => milestone.title === tag_name);
+            console.log(allMilestone)
+
+            const currentMilestone = allMilestone.find(milestone => milestone.title === tag_name);
 
             if (!currentMilestone) return;
 
@@ -66,9 +68,16 @@ jobs:
           script: |
             const { IncomingWebhook } = require('@slack/webhook');
             const date = new Date();
-            const { milestone } = context.payload.pull_request;
+
+            const allMilestones = github.rest.issues.listMilestones({
+              owner,
+              repo
+            })
+
+            const currentMilestone = allMilestones.data.find(milestone => milestone.title === tag_name);
+
             date.setDate(date.getDate() + (8 - date.getDay()));
-            const versions = milestone.title.split('.');
+            const versions = currentMilestone.title.split('.');
             versions[2] = Number(versions[2]) + 1;
             const nextVersion =  versions.join('.')
 
@@ -84,4 +93,7 @@ jobs:
               const webhook = new IncomingWebhook(web_hook_url);
               const { url_html, title } = nextMilestone.data;
               console.log(nextMilestone.data);
+              webhook.send({
+                text: `Thank everyone for your contribution to our latest release 🎉🎉🎉 \n The next release is <${url_html}|${title}> \n Remember to link your PRs to this milestone so you won’t miss the release :wink:`
+              })
             }
