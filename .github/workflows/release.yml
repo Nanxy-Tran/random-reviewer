@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: 14
       - name: Create release
-      - uses: actions/github-script@v5
+        uses: actions/github-script@v5
         env:
           BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
         with:
@@ -49,7 +49,7 @@ jobs:
           node-version: 14
       - run: npm install @slack/webhook
       - name: Create next milestone
-      - uses: actions/github-script@v5
+        uses: actions/github-script@v5
         env:
           SLACK_URL: ${{ secrets.SLACK_HOOK_RELEASE }}
         with:
