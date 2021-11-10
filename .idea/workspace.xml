@@ -46,7 +46,7 @@
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="prettierjs.PrettierConfiguration.Package" value="$PROJECT_DIR$/node_modules/prettier" />
     <property name="settings.editor.selected.configurable" value="org.jetbrains.plugins.github.ui.GithubSettingsConfigurable" />
-    <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
+    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -62,7 +62,7 @@
       <workItem from="1635842834324" duration="4011000" />
       <workItem from="1635850233537" duration="17000" />
       <workItem from="1636427074499" duration="24873000" />
-      <workItem from="1636507251020" duration="5594000" />
+      <workItem from="1636507251020" duration="5901000" />
     </task>
     <task id="LOCAL-00031" summary="sync better">
       <created>1636431441704</created>
