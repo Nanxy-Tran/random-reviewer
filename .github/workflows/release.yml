@@ -27,7 +27,7 @@ jobs:
             const { owner, repo } = context.repo;
             const tag_name = BRANCH_NAME.replace('release/', '')
 
-            const allMilestone = github.rest.issues.listMilestones({
+            const allMilestone = await github.rest.issues.listMilestones({
               owner,
               repo
             })
@@ -69,7 +69,7 @@ jobs:
             const { IncomingWebhook } = require('@slack/webhook');
             const date = new Date();
 
-            const allMilestones = github.rest.issues.listMilestones({
+            const allMilestones = await github.rest.issues.listMilestones({
               owner,
               repo
             })
