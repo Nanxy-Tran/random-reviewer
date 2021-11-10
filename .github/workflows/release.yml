@@ -83,9 +83,7 @@ jobs:
             const allMilestone = await github.rest.issues.listMilestones({
               owner,
               repo
-            })
-
-            console.log(allMilestone)
+            });
 
             const currentMilestone = allMilestone.data.find(milestone => milestone.title === tag_name);
 
@@ -140,8 +138,6 @@ jobs:
             versions[2] = Number(versions[2]) + 1;
             const nextVersion =  versions.join('.')
 
-            console.log(date.toISOString())
-
             const nextMilestone = await github.rest.issues.createMilestone({
               owner,
               repo,
@@ -149,11 +145,13 @@ jobs:
               due_on: date.toISOString()
             })
 
-            console.log(nextMilestone.data)
-
             if (nextMilestone) {
               const web_hook_url = process.env.SLACK_URL;
-              const webhook = new IncomingWebhook(web_hook_url);
+              const web_hook_config = {
+                username: 'GitHub Release bot',
+                icon_url: 'https://octodex.github.com/images/repo.png'
+              };
+              const webhook = new IncomingWebhook(web_hook_url, web_hook_config);
               const { html_url, title } = nextMilestone.data;
 
               webhook.send({
