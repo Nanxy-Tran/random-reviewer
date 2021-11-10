@@ -26,11 +26,17 @@ jobs:
             const { BRANCH_NAME } = process.env;
             const { owner, repo } = context.repo;
             const tag_name = BRANCH_NAME.replace('release/', '')
-            const { milestone } = context.payload.pull_request;
 
-            if (!milestone) return;
+            const allMilestone = github.rest.issues.listMilestones({
+              owner,
+              repo
+            })
 
-            const release_due_on = milestone.due_on;
+            const currentMilestone = allMilestone.data.find(milestone => milestone.title === tag_name);
+
+            if (!currentMilestone) return;
+
+            const release_due_on = currentMilestone.due_on;
             const releaseDate = new Date(release_due_on);
             const tag_time = `${releaseDate.getFullYear()}-${releaseDate.getMonth()}-${releaseDate.getDate()}`;
 
@@ -65,18 +71,20 @@ jobs:
             const versions = milestone.title.split('.');
             versions[2] = Number(versions[2]) + 1;
             const nextVersion =  versions.join('.')
+
             const nextMilestone = await github.rest.issues.createMilestone({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: nextVersion,
               due_on: date.toISOString()
             })
+
             if (nextMilestone) {
               const web_hook_url = process.env.SLACK_URL;
               const webhook = new IncomingWebhook(web_hook_url);
               const { url_html, title } = nextMilestone.data;
               console.log(nextMilestone.data);
-              webhook.send({
-                text: `Thank everyone for your contribution to our latest release 🎉🎉🎉 \n The next release is <${url_html}|${title}> \n Remember to link your PRs to this milestone so you won’t miss the release :wink:`
-              })
+#              webhook.send({
+#                text: `Thank everyone for your contribution to our latest release 🎉🎉🎉 \n The next release is <${url_html}|${title}> \n Remember to link your PRs to this milestone so you won’t miss the release :wink:`
+#              })
             }
