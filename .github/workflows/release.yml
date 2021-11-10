@@ -27,10 +27,13 @@ jobs:
             const { owner, repo } = context.repo;
             const tag_name = BRANCH_NAME.replace('release/', '')
             const { milestone } = context.payload.pull_request;
+
             if (!milestone) return;
+
             const release_due_on = milestone.due_on;
             const releaseDate = new Date(release_due_on);
             const tag_time = `${releaseDate.getFullYear()}-${releaseDate.getMonth()}-${releaseDate.getDate()}`;
+
             const release = await github.rest.repos.createRelease({
               owner,
               repo,
@@ -39,6 +42,7 @@ jobs:
               draft: true,
               generate_release_notes: true
             });
+
   create-milestone:
     if: ${{ contains(github.head_ref, 'release/v') && github.event.action == 'synchronize' }}
     runs-on: ubuntu-latest
@@ -71,6 +75,7 @@ jobs:
               const web_hook_url = process.env.SLACK_URL;
               const webhook = new IncomingWebhook(web_hook_url);
               const { url_html, title } = nextMilestone.data;
+              console.log(nextMilestone.data);
               webhook.send({
                 text: `Thank everyone for your contribution to our latest release 🎉🎉🎉 \n The next release is <${url_html}|${title}> \n Remember to link your PRs to this milestone so you won’t miss the release :wink:`
               })
