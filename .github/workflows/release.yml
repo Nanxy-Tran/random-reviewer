@@ -63,8 +63,8 @@ jobs:
       - name: Create next milestone
         uses: actions/github-script@v5
         env:
-          SLACK_URL: ${{ secrets.SLACK_HOOK_RELEASE }}
-          BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+          SLACK_URL: ${{ secrets.SLACK_HOOK }}
+          BRANCH_NAME: ${{ github.head_ref }}
         with:
           script: |
             const BRANCH_NAME = process.env.BRANCH_NAME;
