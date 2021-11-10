@@ -64,10 +64,13 @@ jobs:
         uses: actions/github-script@v5
         env:
           SLACK_URL: ${{ secrets.SLACK_HOOK_RELEASE }}
+          BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
         with:
           script: |
+            const BRANCH_NAME = process.env.BRANCH_NAME;
             const { IncomingWebhook } = require('@slack/webhook');
             const { owner, repo } = context.repo;
+            const tag_name = BRANCH_NAME.replace('release/', '')
             const date = new Date();
 
             const allMilestones = await github.rest.issues.listMilestones({
