@@ -133,7 +133,7 @@ jobs:
 
             const currentMilestone = allMilestones.data.find(milestone => milestone.title === tag_name);
 
-            date.setDate(date.getDate() + (8 - date.getDay()));
+            date.setDate(date.getUTCDate() + (8 - date.getUTCDay()));
             const versions = currentMilestone.title.split('.');
             versions[2] = Number(versions[2]) + 1;
             const nextVersion =  versions.join('.')
