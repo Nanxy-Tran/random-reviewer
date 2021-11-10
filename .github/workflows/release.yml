@@ -148,6 +148,8 @@ jobs:
               due_on: date.toISOString()
             })
 
+            console.log(nextMilestone.data)
+
             if (nextMilestone) {
               const web_hook_url = process.env.SLACK_URL;
               const webhook = new IncomingWebhook(web_hook_url);
