@@ -34,7 +34,7 @@ jobs:
 
             console.log(allMilestone)
 
-            const currentMilestone = allMilestone.find(milestone => milestone.title === tag_name);
+            const currentMilestone = allMilestone.data.find(milestone => milestone.title === tag_name);
 
             if (!currentMilestone) return;
 
@@ -67,6 +67,7 @@ jobs:
         with:
           script: |
             const { IncomingWebhook } = require('@slack/webhook');
+            const { owner, repo } = context.repo;
             const date = new Date();
 
             const allMilestones = await github.rest.issues.listMilestones({
@@ -82,8 +83,8 @@ jobs:
             const nextVersion =  versions.join('.')
 
             const nextMilestone = await github.rest.issues.createMilestone({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              owner,
+              repo,
               title: nextVersion,
               due_on: date.toISOString()
             })
