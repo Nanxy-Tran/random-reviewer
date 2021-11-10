@@ -107,6 +107,7 @@ jobs:
   create-milestone:
     if: ${{ contains(github.head_ref, 'release/v') && github.event.action == 'synchronize' }}
     runs-on: ubuntu-latest
+    needs: create-release
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
