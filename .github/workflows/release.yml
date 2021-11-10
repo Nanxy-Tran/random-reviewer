@@ -93,13 +93,13 @@ jobs:
 
             const release_due_on = currentMilestone.due_on;
             const releaseDate = new Date(release_due_on);
-            const tag_time = `${releaseDate.getFullYear()}-${releaseDate.getMonth()}-${releaseDate.getDate()}`;
+            const tag_time = `${releaseDate.getFullYear()}-${releaseDate.getMonth() + 1}-${releaseDate.getDate()}`;
 
             const release = await github.rest.repos.createRelease({
               owner,
               repo,
               tag_name,
-              name: `[${tag_name}] ${tag_time}`,
+              name: `${tag_name.replace('v','')} [${tag_time}]`,
               draft: true,
               generate_release_notes: true
             });
@@ -139,6 +139,8 @@ jobs:
             versions[2] = Number(versions[2]) + 1;
             const nextVersion =  versions.join('.')
 
+            console.log(date.toISOString())
+
             const nextMilestone = await github.rest.issues.createMilestone({
               owner,
               repo,
@@ -150,7 +152,7 @@ jobs:
               const web_hook_url = process.env.SLACK_URL;
               const webhook = new IncomingWebhook(web_hook_url);
               const { html_url, title } = nextMilestone.data;
-              console.log(nextMilestone.data);
+
               webhook.send({
                 text: `Thank everyone for your contribution to our latest release 🎉🎉🎉 \n The next release is <${html_url}|${title}> \n Remember to link your PRs to this milestone so you won’t miss the release :wink:`
               })
