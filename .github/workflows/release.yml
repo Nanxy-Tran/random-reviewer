@@ -136,6 +136,8 @@ jobs:
 
             date.setUTCDate(date.getUTCDate() + (8 - date.getUTCDay()));
             date.setHours(12)
+
+            # Split version into major minor and patch, then update patch which indexed at 2
             const versions = currentMilestone.title.split('.');
             versions[2] = Number(versions[2]) + 1;
             const nextVersion =  versions.join('.')
@@ -148,12 +150,13 @@ jobs:
             })
 
             if (nextMilestone) {
-              const web_hook_url = process.env.SLACK_URL;
-              const web_hook_config = {
-                username: 'GitHub Release bot',
-                icon_url: 'https://octodex.github.com/images/bouncercat.png'
-              };
-              const webhook = new IncomingWebhook(web_hook_url, web_hook_config);
+              const webHookUrl = process.env.SLACK_URL;
+                            const webHookConfig = {
+                              username: 'GitHub Release bot',
+                              icon_url: 'https://octodex.github.com/images/bouncercat.png'
+                            };
+
+              const webhook = new IncomingWebhook(webHookUrl, webHookConfig);
               const { html_url, title } = nextMilestone.data;
 
               webhook.send({
