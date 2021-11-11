@@ -137,7 +137,6 @@ jobs:
             date.setUTCDate(date.getUTCDate() + (8 - date.getUTCDay()));
             date.setHours(12)
 
-            # Split version into major minor and patch, then update patch which indexed at 2
             const versions = currentMilestone.title.split('.');
             versions[2] = Number(versions[2]) + 1;
             const nextVersion =  versions.join('.')
