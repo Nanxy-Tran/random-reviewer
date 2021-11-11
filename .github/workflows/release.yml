@@ -55,6 +55,8 @@ jobs:
               return description + prContent
             }, header);
 
+            console.log(body);
+
             github.rest.pulls.update({
               body,
               pull_number: context.issue.number,
@@ -149,7 +151,7 @@ jobs:
               const web_hook_url = process.env.SLACK_URL;
               const web_hook_config = {
                 username: 'GitHub Release bot',
-                icon_url: 'https://octodex.github.com/images/nyantocat.gif'
+                icon_url: 'https://octodex.github.com/images/bouncercat.png'
               };
               const webhook = new IncomingWebhook(web_hook_url, web_hook_config);
               const { html_url, title } = nextMilestone.data;
