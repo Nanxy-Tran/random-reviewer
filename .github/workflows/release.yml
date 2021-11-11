@@ -137,9 +137,9 @@ jobs:
             date.setUTCDate(date.getUTCDate() + (8 - date.getUTCDay()));
             date.setHours(12)
 
-            const versions = currentMilestone.title.split('.');
-            versions[2] = Number(versions[2]) + 1;
-            const nextVersion =  versions.join('.')
+            const [majorVersion, minorVersion, patchVersion] = currentMilestone.title.split('.');
+            const nextPatch = Number(patchVersion) + 1;
+            const nextVersion =  [majorVersion, minorVersion, nextPatch].join('.')
 
             const nextMilestone = await github.rest.issues.createMilestone({
               owner,
