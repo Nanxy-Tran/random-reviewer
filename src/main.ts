@@ -60,7 +60,7 @@ const main = async () => {
     core.info(
       "This PR is randomly assigned: " +
         isRandomReview +
-        "type of isRandom" +
+        "is random review" +
         typeof isRandomReview
     );
   };

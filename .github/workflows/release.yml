@@ -1,0 +1,156 @@
+name: Release PR
+on:
+  pull_request:
+    types:
+      - opened
+      - closed
+    branches:
+      - v1
+
+jobs:
+  update-release-content:
+    if: ${{ contains(github.head_ref, 'release/v') && github.event.action == 'opened' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - run: npm install lodash.groupby
+      - name: Update content of release 📖
+        uses: actions/github-script@v5
+        env:
+          BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+        with:
+          script: |
+            const groupBy = require('lodash.groupby');
+            const version = process.env.BRANCH_NAME.replace('release/', '');
+            const params = [
+              'repo:' + context.repo.owner + '/' + context.repo.repo,
+              'type:pr',
+              'milestone:' + version,
+              'state:closed'
+            ]
+            const issue = await github.request('GET /search/issues', {
+              q: params.join('+')
+            });
+
+            const milestone = groupBy(issue.data.items, pr => pr.assignee.login);
+
+            const newLine = `
+
+            @`;
+
+            const header = `## Type
+            **RELEASE**
+
+            ## Description`;
+
+            const body = Object.keys(milestone).reduce((description, assignee) => {
+              description = description + newLine + assignee
+              const listPR = milestone[assignee]
+              const prContent = listPR.map(pr => '\n- ' + pr.pull_request.html_url)
+              return description + prContent
+            }, header);
+
+            github.rest.pulls.update({
+              body,
+              pull_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+  create-release:
+    if: ${{ contains(github.head_ref, 'release/v') && github.event.action == 'closed' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - name: Create release
+        uses: actions/github-script@v5
+        env:
+          BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const allMilestones = await github.rest.issues.listMilestones({
+              owner,
+              repo
+            });
+
+            const tagName = process.env.BRANCH_NAME.replace('release/', '')
+            const currentMilestone = allMilestones.data.find(milestone => milestone.title === tagName);
+
+            if (!currentMilestone) return;
+
+            const releaseDate = new Date(currentMilestone.due_on);
+            const tagTime = `${releaseDate.getFullYear()}-${releaseDate.getMonth() + 1}-${releaseDate.getDate()}`;
+
+            const release = await github.rest.repos.createRelease({
+              owner,
+              repo,
+              tag_name: tagName,
+              name: `${tagName.replace('v','')} [${tagTime}]`,
+              draft: true,
+              generate_release_notes: true
+            });
+
+  create-milestone:
+    if: ${{ contains(github.head_ref, 'release/v') && github.event.action == 'closed' }}
+    runs-on: ubuntu-latest
+    needs: create-release
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - run: npm install @slack/webhook
+      - name: Create next milestone
+        uses: actions/github-script@v5
+        env:
+          SLACK_URL: ${{ secrets.SLACK_HOOK }}
+          BRANCH_NAME: ${{ github.head_ref }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const allMilestones = await github.rest.issues.listMilestones({
+              owner,
+              repo
+            })
+
+            const tagName = process.env.BRANCH_NAME.replace('release/', '')
+            const currentMilestone = allMilestones.data.find(milestone => milestone.title === tagName);
+
+            const numberDayOfWeekCycle = 8;
+            const nextDueDate = new Date();
+            nextDueDate.setUTCDate(nextDueDate.getUTCDate() + (numberDayOfWeekCycle - nextDueDate.getUTCDay()));
+            nextDueDate.setHours(12)
+
+            const [majorVersion, minorVersion, patchVersion] = currentMilestone.title.split('.');
+            const nextPatch = Number(patchVersion) + 1;
+            const nextVersion =  [majorVersion, minorVersion, nextPatch].join('.')
+
+            const nextMilestone = await github.rest.issues.createMilestone({
+              owner,
+              repo,
+              title: nextVersion,
+              due_on: nextDueDate.toISOString()
+            })
+
+            if (nextMilestone) {
+              const { html_url, title } = nextMilestone.data;
+
+              const slackConfig = {
+                username: 'GitHub release bot',
+                icon_url: 'https://octodex.github.com/images/bouncercat.png'
+              };
+
+              const { IncomingWebhook } = require('@slack/webhook');
+              const webhook = new IncomingWebhook(process.env.SLACK_URL, slackConfig);
+
+              webhook.send({
+                text: `Thank everyone for your contribution to our latest release 🎉🎉🎉 \n The next release is <${html_url}|${title}> \n Remember to link your PRs to this milestone so you won’t miss the release :wink:`
+              })
+            }
