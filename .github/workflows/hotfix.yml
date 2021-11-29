@@ -1,0 +1,28 @@
+name: Read PR
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  update-release-content:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - name: Update content of release 📖
+        uses: actions/github-script@v5
+        env:
+          BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+        with:
+          script: |
+            const groupBy = require('lodash.groupby');
+            const version = process.env.BRANCH_NAME;
+            console.log(version);
+
+            console.log(context.payload)
+            console.log(github.payload)
+
+
