@@ -19,7 +19,6 @@ jobs:
           BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
         with:
           script: |
-            const groupBy = require('lodash.groupby');
             const version = process.env.BRANCH_NAME;
             console.log(version);
 
