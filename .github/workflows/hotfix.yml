@@ -17,12 +17,10 @@ jobs:
         uses: actions/github-script@v5
         env:
           BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+          TITLE: ${{ github.event.pull_request.title }}
         with:
           script: |
-            const version = process.env.BRANCH_NAME;
+            const version = process.env.TITLE;
             console.log(version);
-
-            console.log(context.payload)
-            console.log(github.payload)
 
 
