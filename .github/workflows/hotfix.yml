@@ -14,13 +14,10 @@ jobs:
         with:
           node-version: 14
       - name: Update content of release 📖
-        uses: actions/github-script@v5
         env:
           BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
           TITLE: ${{ github.event.pull_request.title }}
-        with:
-          script: |
-            const version = process.env.TITLE;
-            console.log(version);
+        run: |
+          echo $TITLE
 
 
