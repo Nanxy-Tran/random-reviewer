@@ -46,7 +46,7 @@ async function getDeployments() {
                 resolve(
                     releases
                         .map(filterOverdueDep)
-                        .filter((releaseMessage) => releaseMessage),
+                        .filter((deployment) => deployment),
                 );
             });
         });
@@ -56,7 +56,7 @@ async function getDeployments() {
             reject([]);
         });
 
-        req.end(() => console.log("\x1b[103m%\x1b[0m", '😤 Fetching deployments 😤...'));
+        req.end(() => console.log("\x1b[46m", '😤 Fetching deployments 😤...', '\x1b[0m'));
     });
 }
 
@@ -91,17 +91,16 @@ async function deleteDeployments(deployment) {
             reject(error);
         });
 
-        delReq.end(() => console.log("\x1b[41m%\x1b[0m", `Deleting deployment name: ${deployment.name} !!!!... 🔥`));
+        delReq.end(() => console.log("\x1b[31m", `Deleting deployment name: ${deployment.name} !!!!... 🔥`, '\x1b[0m'));
     });
 }
 
 async function run() {
-    console.log(IGNORE_BRANCH)
     const overDueDeps = await getDeployments();
 
     for(let i = 0; i < 5; i++) {
         const result = await deleteDeployments(overDueDeps[i]);
-        console.log("\x1b[32m%\x1b[0m" , result)
+        console.log("\x1b[32m", result,'\x1b[0m')
     }
 
 }
