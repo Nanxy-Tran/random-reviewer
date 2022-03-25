@@ -13,11 +13,11 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 14
-      - name: Update content of release 📖
+      - name: Scan and remove stale deployments 📖
         env:
           BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
-          TITLE: ${{ github.event.pull_request.title }}
         run: |
-          echo $TITLE
+          echo "GO BRO NAO GIAO SU";
+          node ./script/clean_deploys.js
 
 

@@ -18,7 +18,7 @@ const isOverDue = (buildTime) => {
     return buildTime.getTime() < OVERDUE_MILESTONE.getTime();
 };
 
-// const IGNORE_BRANCH = ['master'];
+const IGNORE_BRANCH = [process.env.BRANCH_NAME];
 
 async function getDeployments() {
     return new Promise((resolve, reject) => {
@@ -94,6 +94,7 @@ async function deleteDeployments(deploymentID) {
 }
 
 async function run() {
+    console.log(IGNORE_BRANCH)
     const overDueDeps = await getDeployments();
     console.log(overDueDeps);
 
