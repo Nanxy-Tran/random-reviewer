@@ -40,7 +40,7 @@ async function getDeployments() {
                             const formattedReleaseTime = new Date(release.latest_release.upload_time);
 
                             if (isOverDue(formattedReleaseTime)) {
-                                return release.id;
+                                return release;
                             }
                         })
                         .filter((releaseMessage) => releaseMessage),
@@ -57,13 +57,13 @@ async function getDeployments() {
     });
 }
 
-async function deleteDeployments(deploymentID) {
+async function deleteDeployments(deployment) {
     return new Promise((resolve, reject) => {
         const delReq = https.request(
             {
                 ...defaultOptions,
                 method: 'DELETE',
-                path: `/users/deployments/${deploymentID}`,
+                path: `/users/deployments/${deployment.id}`,
             },
             (res) => {
                 let body = '';
@@ -73,7 +73,7 @@ async function deleteDeployments(deploymentID) {
 
                 res.on('end', () => {
                     if (res.statusCode === 200) {
-                        resolve(`Successfully delete deployment id ${deploymentID}`);
+                        resolve(`Successfully delete deployment id ${deployment.name}`);
                     } else {
                         console.log(res.statusMessage);
                         console.log(res.statusCode);
@@ -85,11 +85,11 @@ async function deleteDeployments(deploymentID) {
         );
 
         delReq.on('error', (error) => {
-            console.log(`Failed to remove deployment ID: ${deploymentID}, error: ${error.message}`);
+            console.log(`Failed to remove deployment ID: ${deployment.name}, error: ${error.message}`);
             reject(error);
         });
 
-        delReq.end(() => console.log(`Deleting deployment ID: ${deploymentID} !!!!...`));
+        delReq.end(() => console.log(`Deleting deployment ID: ${deployment.name} !!!!...`));
     });
 }
 
