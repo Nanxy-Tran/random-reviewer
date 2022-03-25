@@ -85,11 +85,11 @@ async function deleteDeployments(deployment) {
         );
 
         delReq.on('error', (error) => {
-            console.log(`Failed to remove deployment ID: ${deployment.name}, error: ${error.message}`);
+            console.log(`Failed to remove deployment name: ${deployment.name}, error: ${error.message}`);
             reject(error);
         });
 
-        delReq.end(() => console.log(`Deleting deployment ID: ${deployment.name} !!!!...`));
+        delReq.end(() => console.log(`Deleting deployment name: ${deployment.name} !!!!... 🔥 \n`));
     });
 }
 
