@@ -18,6 +18,18 @@ const isOverDue = (buildTime) => {
     return buildTime.getTime() < OVERDUE_MILESTONE.getTime();
 };
 
+const filterOverdueDep = (deployment) => {
+        const uploadTime = deployment?.latest_release?.upload_time ?? '';
+        if (!uploadTime) return;
+
+        const formattedReleaseTime = new Date(deployment.latest_release.upload_time);
+
+        if (isOverDue(formattedReleaseTime)) {
+            return deployment;
+        }
+    }
+
+
 const IGNORE_BRANCH = [process.env.BRANCH_NAME];
 
 async function getDeployments() {
@@ -33,16 +45,7 @@ async function getDeployments() {
                 console.log('Total deployments :', releases.length);
                 resolve(
                     releases
-                        .map((release) => {
-                            const uploadTime = release?.latest_release?.upload_time ?? '';
-                            if (!uploadTime) return;
-
-                            const formattedReleaseTime = new Date(release.latest_release.upload_time);
-
-                            if (isOverDue(formattedReleaseTime)) {
-                                return release;
-                            }
-                        })
+                        .map(filterOverdueDep)
                         .filter((releaseMessage) => releaseMessage),
                 );
             });
@@ -53,7 +56,7 @@ async function getDeployments() {
             reject([]);
         });
 
-        req.end(() => console.log(`Fetching deployments !!!!...`));
+        req.end(() => console.log("\x1b[103m%\x1b[0m", '😤 Fetching deployments 😤...'));
     });
 }
 
@@ -73,11 +76,10 @@ async function deleteDeployments(deployment) {
 
                 res.on('end', () => {
                     if (res.statusCode === 200) {
-                        resolve(`Successfully delete deployment id ${deployment.name}`);
+                        resolve(`Successfully delete deployment name: ${deployment.name} ✅ \n`);
                     } else {
-                        console.log(res.statusMessage);
+                        console.log("\x1b[41m%\x1b[0m", res.statusMessage);
                         console.log(res.statusCode);
-                        console.log(JSON.parse(body));
                         reject(undefined)
                     }
                 });
@@ -89,18 +91,17 @@ async function deleteDeployments(deployment) {
             reject(error);
         });
 
-        delReq.end(() => console.log(`Deleting deployment name: ${deployment.name} !!!!... 🔥 \n`));
+        delReq.end(() => console.log("\x1b[41m%\x1b[0m", `Deleting deployment name: ${deployment.name} !!!!... 🔥`));
     });
 }
 
 async function run() {
     console.log(IGNORE_BRANCH)
     const overDueDeps = await getDeployments();
-    console.log(overDueDeps);
 
     for(let i = 0; i < 5; i++) {
         const result = await deleteDeployments(overDueDeps[i]);
-        console.log(result)
+        console.log("\x1b[32m%\x1b[0m" , result)
     }
 
 }
