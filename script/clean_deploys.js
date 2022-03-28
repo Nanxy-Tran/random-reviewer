@@ -72,7 +72,7 @@ function deleteDeployments(app) {
                  },
                  (res) => {
                      res.on('end', () => {
-                         if (res.statusCode === 200) {
+                         if (res.statusCode === 200 || res.statusCode === 204) {
                              resolve(`Successfully delete deployment name: ${app}-${deployment.name} ✅ \n`);
                          } else {
                              console.log("\x1b[41m%\x1b[0m", res.statusMessage);
@@ -100,8 +100,7 @@ async function run() {
          const overDueDeps = await getDeployments(apps[j])();
 
          for(let i = 0; i < 5; i++) {
-             const result = await deleteDeployments(apps[j])(overDueDeps[i]);
-             console.log("\x1b[32m", result,'\x1b[0m')
+             await deleteDeployments(apps[j])(overDueDeps[i]);
          }
      }
 }
