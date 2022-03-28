@@ -78,6 +78,7 @@ function deleteDeployments(app) {
                      });
 
                      res.on('end', () => {
+                         console.log(res.statusCode)
                          if (res.statusCode === 200 || res.statusCode === 204) {
                              resolve(`Successfully delete deployment name: ${app}-${deployment.name} ✅ \n`);
                          } else {
