@@ -29,7 +29,7 @@ const filterOverdueDep = (deployment) => {
     }
 
 
-const IGNORE_BRANCH = [process.env.BRANCH_NAME];
+// const IGNORE_BRANCH = [process.env.BRANCH_NAME];
 
  function getDeployments(app) {
      return async function () {

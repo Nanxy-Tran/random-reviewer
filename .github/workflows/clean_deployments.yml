@@ -17,7 +17,6 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
         run: |
-          echo "GO BRO NAO GIAO SU";
           node ./script/clean_deploys.js
 
 
