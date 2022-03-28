@@ -71,11 +71,11 @@ function deleteDeployments(app) {
                      path: `/users/${app}/${deployment.id}`,
                  },
                  (res) => {
-                     let body = '';
-
-                     res.on('data', function (chunk) {
-                         body += chunk;
-                     });
+                     // let body = '';
+                     //
+                     // res.on('data', function (chunk) {
+                     //     body += chunk;
+                     // });
 
                      res.on('end', () => {
                          console.log(res.statusCode)
