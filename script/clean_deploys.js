@@ -32,7 +32,7 @@ const filterOverdueDep = (deployment) => {
 // const IGNORE_BRANCH = [process.env.BRANCH_NAME];
 
  function getDeployments(app) {
-     return async function () {
+     return function () {
          return new Promise((resolve, reject) => {
              const req = https.request({...defaultOptions, path: `/users/${app}`}, (res) => {
                  let body = '';
@@ -62,7 +62,7 @@ const filterOverdueDep = (deployment) => {
  }
 
 function deleteDeployments(app) {
-     return async function(deployment) {
+     return function(deployment) {
          return new Promise((resolve, reject) => {
              const delReq = https.request(
                  {
