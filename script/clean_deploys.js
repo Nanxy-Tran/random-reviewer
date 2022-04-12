@@ -112,11 +112,13 @@ async function run() {
 
      for(let j = 0; j < apps.length; j++) {
          const overDueDeps = await getDeployments(apps[j])();
+         const deletingJobs = []
 
          for (let i = 0; i < overDueDeps.length; i++) {
              await sleep(750)
-             deleteDeployments(apps[j])(overDueDeps[i]).then(resp => resp).catch(err => err)
+             deletingJobs.push(deleteDeployments(apps[j])(overDueDeps[i]))
          }
+         await Promise.allSettled(deletingJobs).then(jobs => jobs.forEach(job => console.log(job))).catch(err => console.log(err))
      }
 }
 
