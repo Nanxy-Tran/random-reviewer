@@ -103,7 +103,7 @@ async function run() {
          const overDueDeps = await getDeployments(apps[j])();
 
          const deletingDeps = overDueDeps.map(dep => deleteDeployments(apps[j])(dep))
-         await Promise.all(deletingDeps)
+         await Promise.allSettled(deletingDeps)
      }
 }
 
