@@ -114,8 +114,8 @@ async function run() {
          const overDueDeps = await getDeployments(apps[j])();
 
          for (let i = 0; i < overDueDeps.length; i++) {
-             await sleep()
-             deleteDeployments(apps[j])(overDueDeps[i]).then(resp => resp)
+             await sleep(150)
+             deleteDeployments(apps[j])(overDueDeps[i]).then(resp => resp).catch(err => err)
          }
      }
 }
