@@ -57,6 +57,7 @@ const filterOverdueDep = (deployment) => {
                          );
                      } catch (err) {
                          console.error(err)
+                         reject([])
                      }
 
                  });
@@ -90,7 +91,6 @@ function deleteDeployments(app) {
                              resolve(`Successfully delete deployment name: ${app}-${deployment.name} ✅ \n`);
                          } else {
                              console.log("\x1b[41m%\x1b[0m", res.statusMessage);
-                             console.log(res.statusCode);
                              reject(undefined)
                          }
                      });
@@ -113,11 +113,10 @@ async function run() {
      for(let j = 0; j < apps.length; j++) {
          const overDueDeps = await getDeployments(apps[j])();
 
-         const deletingDeps = overDueDeps.map(async dep => {
-             await sleep();
-             return  deleteDeployments(apps[j])(dep)
-         })
-         await Promise.allSettled(deletingDeps)
+         for (let i = 0; i < overDueDeps.length; i++) {
+             await sleep()
+             deleteDeployments(apps[j])(overDueDeps[i])
+         }
      }
 }
 
