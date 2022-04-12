@@ -71,11 +71,6 @@ function deleteDeployments(app) {
                      path: `/users/${app}/${deployment.id}`,
                  },
                  (res) => {
-                     // let body = '';
-                     //
-                     // res.on('data', function (chunk) {
-                     //     body += chunk;
-                     // });
                      res.resume();
 
                      res.on('end', () => {
@@ -107,10 +102,8 @@ async function run() {
      for(let j = 0; j < apps.length; j++) {
          const overDueDeps = await getDeployments(apps[j])();
 
-         for(let i = 0; i < 5; i++) {
-            const result =  await deleteDeployments(apps[j])(overDueDeps[i]);
-            console.log(result)
-         }
+         const deletingDeps = overDueDeps.map(dep => deleteDeployments(apps[j])(dep))
+         await Promise.all(deletingDeps)
      }
 }
 
