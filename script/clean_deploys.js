@@ -108,14 +108,14 @@ function deleteDeployments(app) {
 }
 
 async function run() {
-     const apps = ['ios', 'android'];
+     const apps = ['android', 'ios' ];
 
      for(let j = 0; j < apps.length; j++) {
          const overDueDeps = await getDeployments(apps[j])();
 
          for (let i = 0; i < overDueDeps.length; i++) {
              await sleep()
-             deleteDeployments(apps[j])(overDueDeps[i])
+             deleteDeployments(apps[j])(overDueDeps[i]).then(resp => resp)
          }
      }
 }
