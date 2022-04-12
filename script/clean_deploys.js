@@ -41,13 +41,18 @@ const filterOverdueDep = (deployment) => {
                  });
 
                  res.on('end', () => {
-                     let releases = JSON.parse(body);
-                     console.log(`Total deployments for ${app}:`, releases.length);
-                     resolve(
-                         releases
-                             .map(filterOverdueDep)
-                             .filter((deployment) => deployment),
-                     );
+                     try {
+                         let releases = JSON.parse(body);
+                         console.log(`Total deployments for ${app}:`, releases.length);
+                         resolve(
+                             releases
+                                 .map(filterOverdueDep)
+                                 .filter((deployment) => deployment),
+                         );
+                     } catch (err) {
+                         console.error(err)
+                     }
+
                  });
              });
 
