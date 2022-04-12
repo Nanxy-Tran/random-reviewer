@@ -9,6 +9,12 @@ const defaultOptions = {
     },
 };
 
+const sleep = (duration = 50) => {
+    return new Promise(resolve => {
+        setTimeout(() => resolve(), duration)
+    })
+}
+
 const isOverDue = (buildTime) => {
     const SETTLED_MONTHS = 1;
     const OVERDUE_MILESTONE = new Date();
@@ -107,7 +113,10 @@ async function run() {
      for(let j = 0; j < apps.length; j++) {
          const overDueDeps = await getDeployments(apps[j])();
 
-         const deletingDeps = overDueDeps.map(dep => deleteDeployments(apps[j])(dep))
+         const deletingDeps = overDueDeps.map(async dep => {
+             await sleep();
+             return  deleteDeployments(apps[j])(dep)
+         })
          await Promise.allSettled(deletingDeps)
      }
 }
