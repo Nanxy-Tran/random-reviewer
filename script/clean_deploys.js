@@ -117,8 +117,9 @@ async function run() {
          for (let i = 0; i < overDueDeps.length; i++) {
              await sleep(750)
              deletingJobs.push(deleteDeployments(apps[j])(overDueDeps[i]))
+             console.log(`runtime: ${i}`)
          }
-         await Promise.allSettled(deletingJobs).then(jobs => jobs.forEach(job => console.log(job))).catch(err => console.log(err))
+         await Promise.allSettled(deletingJobs).then(jobs => jobs.forEach(job => console.log(job.value))).catch(err => console.log(err))
      }
 }
 
