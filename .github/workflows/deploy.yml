@@ -23,8 +23,8 @@ jobs:
         uses: actions/github-script@v6
         env:
           SLACK_URL: ${{ secrets.SLACK_HOOK }}
-          BRANCH_NAME: ${{ github.event.pull_request.pull_request.body }}
-          COMMIT_MESSAGE: ${{ github.event.pull_request.body }}
+          BRANCH_NAME: ${{ github.event.action }}
+          COMMIT_MESSAGE: ${{ github.event.pull_request.commits_url }}
         with:
           script: |
 
