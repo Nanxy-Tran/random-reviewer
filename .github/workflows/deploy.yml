@@ -24,7 +24,7 @@ jobs:
         env:
           SLACK_URL: ${{ secrets.SLACK_HOOK }}
           BRANCH_NAME: ${{ github.head_ref }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          COMMIT_MESSAGE: ${{ github.event.pull_request.head.ref }}
         with:
           script: |
 
@@ -36,7 +36,8 @@ jobs:
               });
             };
 
-            console.log(github.event)
+            console.log(process.env.COMMIT_MESSAGE, 'commit message');
+            console.log(context.issue);
 
             await sleep(20000);
 
@@ -48,6 +49,6 @@ jobs:
               const { IncomingWebhook } = require('@slack/webhook');
               const webhook = new IncomingWebhook(process.env.SLACK_URL, slackConfig);
               webhook.send({
-                text: `Github has deployed the commit: ${lastestMessage}`
+                text: `Github has deployed the commit: ${JSON.stringify(lastestMessage)}`
               })
             }
