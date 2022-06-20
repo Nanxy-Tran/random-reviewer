@@ -24,7 +24,7 @@ jobs:
         env:
           SLACK_URL: ${{ secrets.SLACK_HOOK }}
           BRANCH_NAME: ${{ github.head_ref }}
-          COMMIT_MESSAGE: ${{ github.event.pull_request.head.ref }}
+          COMMIT_MESSAGE: ${{ github.event.payload.commits[0].message }}
         with:
           script: |
 
@@ -37,7 +37,6 @@ jobs:
             };
 
             console.log(process.env.COMMIT_MESSAGE, 'commit message');
-            console.log(context.issue);
 
             await sleep(20000);
 
