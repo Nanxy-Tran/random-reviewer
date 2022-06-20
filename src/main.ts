@@ -57,7 +57,6 @@ const main = async () => {
       pull_number: context.payload.pull_request?.number,
     });
     core.info(`Auto assign pull request to reviewers successfully ! `);
-    core.info("Small change to trigger workflow")
     core.info(
       "This PR is randomly assigned: " +
         isRandomReview +
