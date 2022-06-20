@@ -1,0 +1,50 @@
+name: Deploy CodePush
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    branches:
+      - master
+
+jobs:
+  create-milestone:
+    concurrency:
+      group: ${{ github.head_ref }}
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - run: npm install @slack/webhook
+      - name: Create next milestone
+        uses: actions/github-script@v6
+        env:
+          SLACK_URL: ${{ secrets.SLACK_HOOK }}
+          BRANCH_NAME: ${{ github.head_ref }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        with:
+          script: |
+            const lastestMessage = env.COMMIT_MESSAGE
+
+            const sleep = async (duration) => {
+              await new Promise((resolve) => {
+                setTimeout(resolve, duration);
+              });
+            };
+
+            await sleep(10000);
+
+            if (lastestMessage) {
+              const slackConfig = {
+                username: 'GitHub Milestone',
+                icon_url: 'https://octodex.github.com/images/bouncercat.png'
+              };
+              const { IncomingWebhook } = require('@slack/webhook');
+              const webhook = new IncomingWebhook(process.env.SLACK_URL, slackConfig);
+              webhook.send({
+                text: `Github has deployed the commit: ${lastestMessage}`
+              })
+            }
