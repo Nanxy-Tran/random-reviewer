@@ -3,6 +3,7 @@ on:
   workflow_run:
     workflows: [Deploy CodePush]
     types: [completed]
+
 jobs:
     on-failure:
       runs-on: ubuntu-latest
