@@ -1,0 +1,46 @@
+name: Notify failed workflows
+on:
+  workflow_run:
+    workflows: [deploy]
+    types: [completed]
+jobs:
+    on-failure:
+      runs-on: ubuntu-latest
+      if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+      steps:
+        - uses: actions/checkout@v2
+        - uses: actions/setup-node@v2
+          with:
+            node-version: 16
+        - run: npm install @slack/webhook
+        - name: Create next milestone
+          uses: actions/github-script@v6
+          env:
+            SLACK_URL: ${{ secrets.SLACK_HOOK }}
+            BRANCH_NAME: ${{ github.event.action }}
+            COMMIT_MESSAGE: ${{ github.event.workflow.url }}
+          with:
+            script: |
+
+              const lastestMessage = process.env.COMMIT_MESSAGE
+
+              const sleep = async (duration) => {
+                await new Promise((resolve) => {
+                  setTimeout(resolve, duration);
+                });
+              };
+
+              await sleep(20000);
+
+              if (lastestMessage) {
+                const slackConfig = {
+                  username: 'GitHub Milestone',
+                  icon_url: 'https://octodex.github.com/images/bouncercat.png'
+                };
+                const { IncomingWebhook } = require('@slack/webhook');
+                const webhook = new IncomingWebhook(process.env.SLACK_URL, slackConfig);
+                webhook.send({
+                  text: `Deployed failed the commit: ${JSON.stringify(lastestMessage)}`
+                })
+              }
+
