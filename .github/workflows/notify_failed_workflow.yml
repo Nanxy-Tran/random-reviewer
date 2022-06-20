@@ -1,8 +1,10 @@
 name: Notify failed workflows
 on:
   workflow_run:
-    workflows: [Deploy CodePush]
-    types: [completed]
+    workflows:
+      - Deploy CodePush
+    types:
+      - completed
 
 jobs:
     on-failure:
