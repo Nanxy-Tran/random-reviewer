@@ -58,6 +58,11 @@ const main = async () => {
     });
     core.info(`Auto assign pull request to reviewers successfully ! `);
     core.info(`Auto assign pull request to reviewers successfully ! `);
+    core.info(`Auto assign pull request to reviewers successfully ! `);
+
+    core.info(`Auto assign pull request to reviewers successfully ! `);
+
+
 
     core.info(
       "This PR is randomly assigned: " +
