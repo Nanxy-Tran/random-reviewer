@@ -1,8 +1,9 @@
 name: Notify failed workflows
 on:
   workflow_run:
-    workflows: [deploy]
+    workflows: [Deploy CodePush]
     types: [completed]
+
 jobs:
     on-failure:
       runs-on: ubuntu-latest
