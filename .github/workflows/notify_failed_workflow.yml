@@ -9,7 +9,6 @@ on:
 jobs:
     on-failure:
       runs-on: ubuntu-latest
-      if: ${{ github.event.workflow_run.conclusion == 'failure' }}
       steps:
         - uses: actions/checkout@v2
         - uses: actions/setup-node@v2
@@ -21,11 +20,12 @@ jobs:
           env:
             SLACK_URL: ${{ secrets.SLACK_HOOK }}
             BRANCH_NAME: ${{ github.event.action }}
-            COMMIT_MESSAGE: ${{ github.event.workflow.url }}
+            COMMIT_MESSAGE: ${{ github.event.workflow_run.conclusion }}
           with:
             script: |
 
               const lastestMessage = process.env.COMMIT_MESSAGE
+              console.log(lastestMessage)
 
               const sleep = async (duration) => {
                 await new Promise((resolve) => {
