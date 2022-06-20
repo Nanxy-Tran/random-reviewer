@@ -24,7 +24,7 @@ jobs:
         env:
           SLACK_URL: ${{ secrets.SLACK_HOOK }}
           BRANCH_NAME: ${{ github.head_ref }}
-          COMMIT_MESSAGE: ${{ JSON.stringify(github.event) }}
+          COMMIT_MESSAGE: ${{ github.event.comment }}
         with:
           script: |
 
