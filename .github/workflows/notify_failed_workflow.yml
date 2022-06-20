@@ -5,8 +5,6 @@ on:
       - Deploy CodePush
     types:
       - completed
-    branches:
-      - master
 
 jobs:
     on-failure:
